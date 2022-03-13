@@ -6,7 +6,7 @@ class Analysis(models.Model):
     class Meta:
         db_table = 'ai_analysis_log'
 
-    image_path = models.CharField(max_length=255, blank=False, null=True)
+    image_path = models.CharField(max_length=255, blank=True, null=True)
     success = models.CharField(max_length=255, blank=True, null=True)
     message = models.CharField(max_length=255, blank=True, null=True)
     class_num = models.IntegerField(db_column='class', blank=True, null=True)
