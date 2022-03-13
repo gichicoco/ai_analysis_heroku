@@ -15,7 +15,7 @@ from .forms import AnalysisForm
 def top(request, num=1):
     analyses = Analysis.objects.all()
     analyses = analyses.order_by('-id')
-    page = Paginator(analyses, 10)
+    page = Paginator(analyses, 5)
     params = {
         'analyses': page.get_page(num),
     }
