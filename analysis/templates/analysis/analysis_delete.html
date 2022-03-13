@@ -1,0 +1,44 @@
+{% extends 'analysis/base.html' %}
+
+{% block content %}
+  <h1 class="display-4 text-primary mt-2">AI Analysis</h1>
+  <p class="mt-3" style="color:red">以下のレコードを削除します。</p>
+  <table class="table table-borderless mt-4">
+    <tr>
+      <th style="width:25%">id</th>
+      <td style="width:25%">{{ analysis.pk }}</td>
+      <td style="width:50%"></td>
+    </tr>
+    <tr>
+      <th>image_path</th>
+      <td>{{ analysis.image_path }}</td>
+    </tr>
+    <tr>
+      <th>success</th>
+      <td>{{ analysis.success }}</td>
+    </tr>
+    <tr>
+      <th>message</th>
+      <td>{{ analysis.message }}</td>
+    </tr>
+    <tr>
+      <th>class</th>
+      <td>{{ analysis.class_num }}</td>
+    </tr>
+    <tr>
+      <th>confidence</th>
+      <td>{{ analysis.confidence }}</td>
+    </tr>
+    <tr>
+      <th>request_timestamp</th>
+      <td>{{ analysis.request_timestamp }}</td>
+    </tr>
+    <tr>
+      <th>response_timestamp</th>
+      <td>{{ analysis.response_timestamp }}</td>
+    </tr>
+  </table>
+  <form action="{% url 'analysis_delete' id %}" method="post">
+  {% csrf_token %}
+  <input type="submit" value="削除" class="btn btn-primary mt-2">
+{% endblock %}

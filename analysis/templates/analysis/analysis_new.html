@@ -1,0 +1,20 @@
+{% extends 'analysis/base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1 class="display-6 text-primary mt-4">AI Analysis</h1>
+  <p class="mt-5">画像ファイルのパスを入力してください。</p>
+  <form method="post">
+    {% csrf_token %}
+    <table class="mt-2" width="300">
+      <tr>
+        <th>{{ form.image_path.label }}</th>
+        <td>{{ form.image_path }}</td>
+      </tr>
+    </table>
+    <div class="mt-4">
+      <button type="submit" class="btn btn-primary mt-4">送信</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

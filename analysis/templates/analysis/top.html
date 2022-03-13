@@ -1,0 +1,71 @@
+{% extends 'analysis/base.html' %}
+
+{% block content %}
+  <h4 class="mt-4">ai_analysis_log</h2>
+  {% if analyses %}
+  <table class="table table-striped mt-4">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">id</th>
+        <th scope="col">image_path</th>
+        <th scope="col">success</th>
+        <th scope="col">message</th>
+        <th scope="col">class</th>
+        <th scope="col">confidence</th>
+        <th scope="col">#</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for analysis in analyses %}
+    <tr>
+      <th>{{ analysis.pk }}</th>
+      <th><a href="{% url 'analysis_detail' analysis.pk %}">{{ analysis.image_path }}</a></th>
+      <th>{{ analysis.success }}</th>
+      <th>{{ analysis.message }}</th>
+      <th>{{ analysis.class_num }}</th>
+      <th>{{ analysis.confidence }}</th>
+      <th><a href='{% url 'analysis_delete' analysis.id %}'>delete</a></th>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="mt-4 mb-4">ログがありません。</p>
+  {% endif %}
+  <ul class="pagination">
+    {% if analyses.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="{% url 'top' %}">&laquo; 最初</a>
+    </li>
+    <li class="page-item">
+      <a class="page-link" href="{% url 'top' %}{{ analyses.previous_page_number }}">&laquo; 前</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link">&laquo; 最初</a>
+    <li>
+    <li class="page-item">
+      <a class="page-link">&laquo; 前</a>
+    </li>
+    {% endif %}
+    <li class="page-item">
+      <a class="page-link">
+      {{ analyses.number }} / {{ analyses.paginator.num_pages }}</a>
+    </li>
+    {% if analyses.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="{% url 'top' %}{{ analyses.next_page_number }}">次 &raquo;</a>
+    </li>
+    <li class="page-itm">
+      <a class="page-link" href="{% url 'top' %}{{ analyses.paginator.num_pages }}">最後 &raquo;</a>
+    </li>
+    {% else %}
+    <li class="page-item">
+      <a class="page-link">次 &raquo;</a>
+    </li>
+    <li class="page-item">
+      <a class="page-link">最後 &raquo;</a>
+    </li>
+    {% endif %}
+  </ul>
+{% endblock %}
