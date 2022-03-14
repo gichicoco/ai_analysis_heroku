@@ -5,19 +5,19 @@
   {% if analyses %}
   <table class="table table-striped mt-4">
     <thead class="thead-light">
-      <tr>
-        <th scope="col">id</th>
-        <th scope="col">image_path</th>
-        <th scope="col">success</th>
-        <th scope="col">message</th>
-        <th scope="col">class</th>
-        <th scope="col">confidence</th>
-        <th scope="col">#</th>
+      <tr align="center">
+        <th>id</th>
+        <th>image_path</th>
+        <th>success</th>
+        <th>message</th>
+        <th>class</th>
+        <th>confidence</th>
+        <th>#</th>
       </tr>
     </thead>
     <tbody>
     {% for analysis in analyses %}
-    <tr>
+    <tr align="center" valign="middle">
       <th>{{ analysis.pk }}</th>
       <th><a href="{% url 'analysis_detail' analysis.pk %}">{{ analysis.image_path }}</a></th>
       <th>{{ analysis.success }}</th>
