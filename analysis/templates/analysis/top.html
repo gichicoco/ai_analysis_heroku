@@ -24,7 +24,7 @@
       <th>{{ analysis.message }}</th>
       <th>{{ analysis.class_num }}</th>
       <th>{{ analysis.confidence }}</th>
-      <th><a href='{% url 'analysis_delete' analysis.id %}'>delete</a></th>
+      <th><button type="button" class="btn btn-outline-danger" onclick="location.href='{% url 'analysis_delete' analysis.id %}'">delete</button></th>
     </tr>
     {% endfor %}
     </tbody>

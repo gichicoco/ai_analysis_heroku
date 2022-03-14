@@ -40,5 +40,5 @@
   </table>
   <form action="{% url 'analysis_delete' id %}" method="post">
   {% csrf_token %}
-  <input type="submit" value="削除" class="btn btn-primary mt-2">
+  <input type="submit" value="削除" class="btn btn-danger mt-2">
 {% endblock %}
