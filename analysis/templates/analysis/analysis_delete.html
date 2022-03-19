@@ -40,5 +40,8 @@
   </table>
   <form action="{% url 'analysis_delete' id %}" method="post">
   {% csrf_token %}
-  <input type="submit" value="削除" class="btn btn-danger mt-2">
+  <div class="d-flex justify-content-between p-2" style="width:15%">
+      <button type="button" class="btn btn-outline-secondary" onclick="location.href='{% url 'top' %}'">キャンセル</button>
+      <input type="submit" value="削除" class="btn btn-danger">
+  </div>
 {% endblock %}
