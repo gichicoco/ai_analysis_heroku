@@ -28,49 +28,32 @@ def analysis_new(request):
         form = AnalysisForm(request.POST)
         if form.is_valid():
 
-            # jsonを返す模擬APIの処理
-
             # 現在時刻のUNIX時間（エポック秒）を取得
             request_timestamp = int(time.time())
-            # POSTされた値を取得
-            post_value = request.POST.get('image_path')
-            post_value = post_value.strip()
+            # POSTされたimage_pathの値を取得
+            image_path = request.POST.get('image_path')
+            image_path = image_path.strip()
 
-            # 入力をチェックし、変数に値をセット
-            if (post_value.endswith('.jpg') or post_value.endswith('.png')) \
-                    and not post_value.startswith('.') \
-                    and not re.compile('.+[\s].+').search(post_value):
-                success = True
-                message = 'success'
-                class_num = random.randint(1, 9)
-                confidence = round(random.random(), 4)
-                pre_json = {
-                    'success': success,
-                    'message': message,
-                    'estimated_data': {
-                        'class': class_num,
-                        'confidence': confidence,
-                    }
-                }
-            else:
-                success = False
-                message = 'Error:E50012'
-                class_num = None
-                confidence = None
-                pre_json = {
-                    'success': success,
-                    'message': message,
-                    'estimated_data': {}
-                }
-            # jsonに変換
-            result_json = json.dumps(pre_json)
+            # 模擬API呼び出し
+            response_json = analysis_api(image_path)
 
             # 現在時刻のUNIX時間（エポック秒）を取得
             response_timestamp = int(time.time())
 
+            # APIから返ってきたjsonからDBに保存する値を取得
+            response_json = json.loads(response_json)
+            success = response_json['success']
+            message = response_json['message']
+            if response_json['estimated_data']:
+                class_num = response_json['estimated_data']['class']
+                confidence = response_json['estimated_data']['confidence']
+            else:
+                class_num = None
+                confidence = None
+
             # モデルオブジェクトに値をセット
             analysis = Analysis(
-                image_path=post_value,
+                image_path=image_path,
                 success=success,
                 message=message,
                 class_num=class_num,
@@ -78,14 +61,49 @@ def analysis_new(request):
                 request_timestamp=request_timestamp,
                 response_timestamp=response_timestamp,
             )
+
             # DBに保存
             analysis.save()
 
-            # jsonを返す
-            return HttpResponse(result_json)
+            params = {
+                'analysis': analysis,
+                'response_json': response_json,
+            }
+
+            return render(request, 'analysis/analysis_result.html', params)
+
     else:
         form = AnalysisForm()
     return render(request, "analysis/analysis_new.html", {'form': form})
+
+
+def analysis_api(image_path):
+    # 入力をチェックし、変数に値をセット
+    if (image_path.endswith('.jpg') or image_path.endswith('.png')) \
+            and not image_path.startswith('.') \
+            and not re.compile('.+[\s].+').search(image_path):
+        success = True
+        message = 'success'
+        class_num = random.randint(1, 9)
+        confidence = round(random.random(), 4)
+        estimated_data = {
+            'class': class_num,
+            'confidence': confidence,
+        }
+    else:
+        success = False
+        message = 'Error:E50012'
+        estimated_data = {}
+
+    pre_json = {
+        'success': success,
+        'message': message,
+        'estimated_data': estimated_data,
+    }
+    # jsonに変換
+    result_json = json.dumps(pre_json)
+    # jsonを返す
+    return result_json
 
 
 def analysis_detail(request, analysis_id):
@@ -99,7 +117,6 @@ def analysis_delete(request, analysis_id):
         analysis.delete()
         return redirect(to='top')
     params = {
-        'title': 'Hello',
         'id': analysis_id,
         'analysis': analysis,
     }
