@@ -43,4 +43,8 @@
       <td>{{ analysis.response_timestamp }}</td>
     </tr>
   </table>
+  <div class="d-flex justify-content-between p-3" style="width:20%">
+    <button type="button" class="btn btn-outline-dark" onclick="location.href='{% url 'top' %}'">TOPへ</button>
+    <button type="button" class="btn btn-outline-success" onclick="location.href='{% url 'analysis_new' %}'">続けて分析</button>
+  </div>
 {% endblock %}
