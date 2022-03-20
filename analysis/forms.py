@@ -1,16 +1,23 @@
 from django import forms
+import datetime
+from django.core.files.storage import default_storage
 
-from .models import Analysis
+
+class ImagePathForm(forms.Form):
+
+    image_path = forms.fields.ChoiceField(
+        choices=(),
+        required=True,
+        widget=forms.widgets.Select,
+    )
 
 
-class AnalysisForm(forms.ModelForm):
-    class Meta:
-        model = Analysis
-        fields = (
-            'image_path',
-        )
-        widgets = {
-            'image_path': forms.TextInput(attrs={
-                'placeholder': ' /image/sample.jpg',
-            }),
-        }
+class UploadImageForm(forms.Form):
+    file = forms.ImageField()
+
+    def save(self):
+        now_date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        upload_file = self.files['file']
+        file_name = default_storage.save(
+            now_date + '_' + upload_file.name, upload_file)
+        return default_storage.url(file_name)

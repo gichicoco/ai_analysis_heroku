@@ -1,14 +1,13 @@
-import re
 import json
 import time
 import random
+import glob
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_safe, require_http_methods
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
 
 from .models import Analysis
-from .forms import AnalysisForm
+from .forms import ImagePathForm, UploadImageForm
 
 
 @require_safe
@@ -24,15 +23,23 @@ def top(request, num=1):
 
 @require_http_methods(["GET", "POST", "HEAD"])
 def analysis_new(request):
+
+    # 画像パスの一覧を取得しフォームにセット
+    choices = get_image_list()
+    image_path_form = ImagePathForm()
+    image_path_form.fields['image_path'].choices = choices
+
+    # POST時の処理
     if request.method == 'POST':
-        form = AnalysisForm(request.POST)
-        if form.is_valid():
+
+        # POSTでimage_pathが送られた時の処理
+        if request.POST.get('image_path'):
+
+            # POSTされたimage_pathの値を取得
+            image_path = request.POST.get('image_path').strip()
 
             # 現在時刻のUNIX時間（エポック秒）を取得
             request_timestamp = int(time.time())
-            # POSTされたimage_pathの値を取得
-            image_path = request.POST.get('image_path')
-            image_path = image_path.strip()
 
             # 模擬API呼び出し
             response_json = analysis_api(image_path)
@@ -65,24 +72,45 @@ def analysis_new(request):
             # DBに保存
             analysis.save()
 
-            params = {
+            context = {
                 'analysis': analysis,
                 'response_json': response_json,
             }
 
-            return render(request, 'analysis/analysis_result.html', params)
+            return render(request, 'analysis/analysis_result.html', context)
 
-    else:
-        form = AnalysisForm()
-    return render(request, "analysis/analysis_new.html", {'form': form})
+        # ファイルがアップロードされた時の処理
+        if request.FILES:
+            upload_image_form = UploadImageForm(request.POST, request.FILES)
+
+            filename_save = upload_image_form.save()
+
+            # 画像パスの一覧を取得しフォームにセット
+            choices = get_image_list()
+            image_path_form = ImagePathForm()
+            image_path_form.fields['image_path'].choices = choices
+
+            context = {
+                'image_path_form': image_path_form,
+                'upload_image_form': upload_image_form,
+                'filename_save': filename_save,
+            }
+
+            return render(request, 'analysis/analysis_new.html', context)
+
+    upload_image_form = UploadImageForm()
+    context = {
+        'image_path_form': image_path_form,
+        'upload_image_form': upload_image_form,
+    }
+    return render(request, 'analysis/analysis_new.html', context)
 
 
 def analysis_api(image_path):
-    # 入力をチェックし、変数に値をセット
-    if (image_path.endswith('.jpg') or image_path.endswith('.png')) \
-            and not image_path.startswith('.') \
-            and not re.compile('.+[\s].+').search(image_path):
-        success = True
+    # 成功失敗を判定し、結果に応じて値をセット
+    success = random.choice([True, False])
+
+    if success == True:
         message = 'success'
         class_num = random.randint(1, 9)
         confidence = round(random.random(), 4)
@@ -91,7 +119,6 @@ def analysis_api(image_path):
             'confidence': confidence,
         }
     else:
-        success = False
         message = 'Error:E50012'
         estimated_data = {}
 
@@ -104,6 +131,23 @@ def analysis_api(image_path):
     result_json = json.dumps(pre_json)
     # jsonを返す
     return result_json
+
+
+def get_image_list():
+    # 画像ファイルの一覧を取得
+    files = glob.glob('./image/*')
+
+    # 画像パスの一覧をHTMLで使用できる形（tuple）に整形
+    image_list = []
+    for file in files:
+        image_list.append(file)
+    choices = []
+    choices.append(['', '-- ファイルのパスを選択してください --'])
+    for path in image_list:
+        choice = [path, path]
+        choices.append(choice)
+    choices = tuple(choices)
+    return choices
 
 
 def analysis_detail(request, analysis_id):

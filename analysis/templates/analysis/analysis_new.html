@@ -3,16 +3,32 @@
 {% block content %}
 <div class="container">
   <h1 class="display-6 text-primary mt-4">AI Analysis</h1>
-  <p class="mt-5">画像ファイルのパスを入力してください。</p>
-  <form method="post">
+  <form action="{% url 'analysis_new' %}" method="POST" enctype="multipart/form-data" class="mt-5">
     {% csrf_token %}
-    <table class="mt-2" width="300">
+    {#forms.ImageFieldを表示#}
+    <div class="mt-5">
+      {{ upload_image_form.file }}
+    </div>
+    <div class="p-3">
+      <button type="submit" class="btn btn-outline-secondary btn-sm">アップロード</button>
+    </div>
+    {#保存されたファイルを表示#}
+    {% if filename_save %}
+      <div class="p-3">
+        ファイル名 <font color="blue">{{ filename_save }}</font> で保存されました。
+      </div>
+    {% endif %}
+  </form>
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    <table class="mt-2">
       <tr>
-        <th>{{ form.image_path.label }}</th>
-        <td>{{ form.image_path }}</td>
+        <th style="width:25%"><label for="">{{ image_path_form.image_path.label }}:</label></th>
+        <td>
+          {{ image_path_form.image_path }}
+        </td>
       </tr>
     </table>
-    <p class="mt-4" style="color:blue">拡張子は .jpg と .png のみ有効</p>
     <button type="submit" class="btn btn-primary mt-4">送信</button>
   </form>
 </div>
