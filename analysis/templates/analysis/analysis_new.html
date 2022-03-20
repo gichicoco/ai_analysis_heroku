@@ -5,14 +5,29 @@
   <h1 class="display-6 text-primary mt-4">AI Analysis</h1>
   <form action="{% url 'analysis_new' %}" method="POST" enctype="multipart/form-data" class="mt-5">
     {% csrf_token %}
-    {#forms.ImageFieldを表示#}
     <div class="mt-5">
       {{ upload_image_form.file }}
+      <p>
+        Preview:<br>
+        <img id="preview" style="max-width:200px;">
+      </p>
+      <script>
+        function previewImage(obj){
+          var fileReader = new FileReader();
+          fileReader.onload = (function() {
+            document.getElementById('preview').src = fileReader.result;
+          });
+          fileReader.readAsDataURL(obj.files[0]);
+        }
+        const x = document.getElementById('id_file');
+        x.addEventListener('change', func = () => {
+          previewImage(x);
+        });
+      </script>
     </div>
     <div class="p-3">
       <button type="submit" class="btn btn-outline-secondary btn-sm">アップロード</button>
     </div>
-    {#保存されたファイルを表示#}
     {% if filename_save %}
       <div class="p-3">
         ファイル名 <font color="blue">{{ filename_save }}</font> で保存されました。
