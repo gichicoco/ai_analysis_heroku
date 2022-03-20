@@ -107,6 +107,7 @@ def analysis_new(request):
 
 
 def analysis_api(image_path):
+
     # 成功失敗を判定し、結果に応じて値をセット
     success = random.choice([True, False])
 
@@ -129,6 +130,10 @@ def analysis_api(image_path):
     }
     # jsonに変換
     result_json = json.dumps(pre_json)
+
+    # 分析時間2秒sleep
+    time.sleep(2)
+
     # jsonを返す
     return result_json
 
@@ -140,7 +145,7 @@ def get_image_list():
     # 画像パスの一覧をHTMLで使用できる形（tuple）に整形
     image_list = []
     for file in files:
-        image_list.append(file)
+        image_list.append(file.lstrip('.'))
     choices = []
     choices.append(['', '-- ファイルのパスを選択してください --'])
     for path in image_list:
@@ -160,8 +165,8 @@ def analysis_delete(request, analysis_id):
     if request.method == 'POST':
         analysis.delete()
         return redirect(to='top')
-    params = {
+    context = {
         'id': analysis_id,
         'analysis': analysis,
     }
-    return render(request, 'analysis/analysis_delete.html', params)
+    return render(request, 'analysis/analysis_delete.html', context)
