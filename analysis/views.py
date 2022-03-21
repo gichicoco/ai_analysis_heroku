@@ -170,7 +170,3 @@ def analysis_delete(request, analysis_id):
         'analysis': analysis,
     }
     return render(request, 'analysis/analysis_delete.html', context)
-
-
-def sample(request):
-    return render(request, 'analysis/sample_image.html')
